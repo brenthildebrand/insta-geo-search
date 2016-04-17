@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>insta</title>
+  <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+  <meta charset="utf-8">
+  <script src="http://code.jquery.com/jquery-latest.js"></script>
+  <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&key=AIzaSyDD3o_vzkcWmw4-yDtuFZ0F4lioqWn8eU8"></script>
+  <script src="http://cooper-union-maps-proxy.herokuapp.com/js/draw.js"></script>
+  <script>
+    $(document).ready(function(){
+      /////maps
+      var mapOptions = {
+        zoom: 2,
+        center: new google.maps.LatLng(36.6908389,-76.2487746)
+      };
+
+      var positions = [];
+        {
+          //'title':'home',
+          //'map': new google.maps.LatLng(36.6908389,-76.2487746),
+          //'link':'http://cooper.edu'
+        };
+
+      draw('map', mapOptions, positions);
+      /////insta
+      var searchTerm;
+
+      $("#input").click(function(){
+        $("#input").html("");
+        $("#input").attr("contenteditable", "true");
+        //$(".input").keypress(function(e){ return e.which != 13; searchTerm = getElementsByClass(input).innerHtml();});
+        //console.log(searchTerm);
+      })
+
+      $("#input").keypress(function(e){ return e.which != 13;});
+
+      $(".return_key").click(function(){
+        $(".pic_container").html("");
+        searchTerm = $("#input").html();
+        //searchTerm = document.getElementById("input").innerHtml();
+        var url = "http://cooper-union-instagram-proxy.herokuapp.com/search/tag/" + searchTerm + "?count=33";
+        console.log(searchTerm);
+        $.getJSON(url, function(response){
+        console.log(response);
+        for(var i=0; i<response.length; i++) {
+          $(".pic_container").append("<div class='pic'><img src="+response[i].images.thumbnail.url+" /></div>");
+          $(".pic_container").append("<div class='username'><a href='https://www.instagram.com/" + response[i].user.username + "'>" +response[i].user.username+ "</a></div>");
+          if(response[i].location !== null){
+          positions.push({'title':response[i].caption.text, 'map': new google.maps.LatLng(response[i].location.latitude, response[i].location.longitude)});
+          draw('map', mapOptions, positions);
+        };
+        }
+      });
+      })
+
+      // $(".pic").click(function(){
+      //   mapOptions.center = new google.maps.LatLng(respons,-76.2487746)
+      // })
+
+    });
+  </script>
+  <style>
+    body{
+      font-family: helvetica;
+      margin: 0px;
+      padding: 0px;
+    }
+    a{
+      color: pink;
+    }
+    ::-webkit-scrollbar {
+    display: none;
+    }
+    .container{
+    position: fixed;
+    margin: 0px;
+    top: 50px;
+    left: 0px;
+    width: 277px;
+    height: 80vh;
+    background-color: black;
+    overflow: scroll;
+    font-size: 10px;
+    border: 2px solid white;
+    border-left: 0;
+    border-radius: 0 20px 20px 0;
+    box-shadow: 2px 10px 30px #888888;
+    }
+    #input{
+      top: 50px;
+      left: 0px;
+      font-size: 20px;
+      width: 233px;
+      height: 20px;
+      color: yellow;
+      text-align: right;
+      padding: 5px;
+      outline: 0px solid transparent;
+      cursor: pointer;
+      overflow: hidden;
+      border: 2px solid white;
+      border-top: 0;
+      float: left;
+    }
+    .return_key{
+      top: 50px;
+      left: 243px;
+      font-size: 18px;
+      width: 20px;
+      height: 20px;
+      border-bottom: 2px solid white;
+      float: left;
+      padding: 5px;
+      color: lime;
+      cursor: pointer;
+      border-radius: 0 20px 0px 0;
+    }
+    .username{
+      padding: 70px 0 0 10px;
+      float: left;
+    }
+    .pic{
+      padding: 0;
+      float: left;
+      border:2px solid white;
+      border-top: 0;
+    }
+    .pic_container{
+      width: 100%;
+    }
+    #map{
+      position: fixed;
+      top: 0px;
+      left: 0px;
+      width: 100vw;
+      height:100vh;
+      margin: 0px;
+      padding: 0px;
+    }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <div class="container"><div id="input">SEARCH</div><div class="return_key">&rarr;</div><div class="pic_container"></div></div>
+</body>
+</html>
